@@ -1,0 +1,177 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define SIZE 8
+int optimal = SIZE;
+struct BoardData
+{
+    string Board;
+    int cost;
+    long int heuristic;
+   BoardData(string Board,int cost,long int heuristic)
+        :Board(Board),cost(cost),heuristic(heuristic)
+        {
+        }
+};
+
+	
+	long int factorial(int x)
+	{
+	long int fact = 1;
+	for(long int i = 1; i <= x; i++)
+	fact  *= x;
+	return fact;
+	}
+
+	long int comb(int a, int b)
+	{
+	return factorial(a)/(factorial(b)*factorial(a-b));
+	}
+
+	
+BoardData InitialBoard()
+{
+    string Array;
+		for(int i=0;i<SIZE;++i)
+			for(int j=0;j<SIZE;++j)
+				Array += '0';
+		return BoardData(Array,0,0);
+}
+
+	int find(string Array)
+	{
+	    int i;
+		for(i=0;i<SIZE;i++)
+		{
+			int flag = 0;
+			for(int j = 0; j < SIZE; j++)
+			{
+				if(Array[SIZE*i+j] == '1')
+				{
+					flag = 1;
+					break;
+				}
+			}
+
+			if(flag == 0)
+				return i;
+		}
+		return i;
+	}
+
+	long int Heuristic(string Array)
+	{
+	long int Configure = 0;
+	for(int i=0;i<SIZE;i++)
+	{
+	int rowSum = 0;
+    int colSum = 0;
+	for(int j=0;j<SIZE;j++)
+			{
+				rowSum+=Array[SIZE*i+j]-'0';
+				colSum+=Array[SIZE*j+i]-'0';
+			}
+	Configure+=comb(rowSum, 2) + comb(colSum, 2);
+	}
+	for(int i=0;i<SIZE;i++)
+	{
+		int ls = 0;
+			int rs = 0;
+			for(int j=0;j+i<SIZE;j++)
+			{
+				ls+=Array[SIZE*j+j+i]-'0';
+				rs+=Array[SIZE*(j+i)+j]-'0';
+			}
+	Configure += comb(ls, 2) + comb(rs, 2);
+	}
+	for(int i = 0; i < 2*SIZE-1; i++)
+	{
+	int ls = 0;
+			int rs = 0;
+			if(i<SIZE)
+			{
+			   for(int j=0;i-j>=0;j++)
+			   {
+				   ls += Array[SIZE*j+i-j]-'0';
+			   }
+			}
+	else
+			{
+			   for(int j = i-SIZE+1; j < SIZE; j++)
+			   {
+			       rs += Array[SIZE*j+i-j]-'0';
+			   }
+			}
+	Configure += comb(ls, 2) + comb(rs, 2);
+	}
+	return Configure;
+	}
+
+	
+	void print(string Array)
+	{
+		for(int i = 0; i < SIZE; i++)
+		{
+			for(int j = 0;j < SIZE; j++)
+			{
+				if(Array[SIZE*i+j] == '1')
+                    printf("1 ");
+				else
+                    printf("0 ");
+			}
+		printf("\n");
+		}
+	}
+struct Compare
+{
+    bool operator()(BoardData const& c1, BoardData const& c2)
+    {
+        return c1.cost > c2.cost;
+    }
+};
+
+int main()
+	{
+	
+	BoardData sol = InitialBoard();
+
+	        priority_queue<BoardData, vector<BoardData>,Compare> ucs;
+	 int count = 1;
+        ucs.push(sol);
+
+
+	while(!(ucs.empty()))
+	{
+	
+	BoardData c = ucs.top();
+                ucs.pop();
+                string Answer = c.Board;
+
+	
+	if(c.cost + c.heuristic > optimal)continue;
+
+	
+	int i = find(Answer);
+
+	
+	if(i==SIZE)
+	{
+	 cout<<"Solution Number"<<count<<"\n";
+                        print(Answer);
+                        cout<<"\n\n";
+                        count++;
+	}
+	else
+	{
+	
+	for(int j=0;j<SIZE;j++)
+	{
+	Answer = Answer.substr(0, SIZE*i+j)+"1"+Answer.substr(SIZE*i+j+1);
+	
+	ucs.push(BoardData(Answer,c.cost+1,Heuristic(Answer)));
+                      
+                        Answer = c.Board;
+	}
+	}
+	}
+	return 0;
+	}
