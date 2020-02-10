@@ -1,2 +1,2 @@
 # Artificial_Intelligence
-##CS235 Assignments
+## CS235 Assignments
