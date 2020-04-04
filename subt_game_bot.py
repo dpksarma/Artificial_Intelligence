@@ -86,4 +86,4 @@ if __name__ == "__main__":
             turn = 1;
             print "computer2 moves state to", state
         if state == 0:
-           print "computer2 won!"
+           print "computer2 won!!"
